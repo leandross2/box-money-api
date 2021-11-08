@@ -1,6 +1,7 @@
 import {Router} from 'express'
 import {celebrate, Joi, Segments} from 'celebrate'
 import { AccountController } from '../controllers/AccountController'
+import ensureAuthenticated from '@modules/Shared/infra/http/middlewares/ensureAutentications'
 
 export const accountRoutes = Router()
 
@@ -15,10 +16,4 @@ celebrate({
 }),
 accountController.create)
 
-accountRoutes.get('/:account_id',
-  celebrate({
-    [Segments.PARAMS]: {
-      account_id: Joi.string().guid(),
-    },
-  }),
-accountController.show)
+accountRoutes.get('/me', ensureAuthenticated ,accountController.show)

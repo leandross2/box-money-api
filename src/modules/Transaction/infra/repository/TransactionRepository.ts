@@ -14,15 +14,12 @@ export class TransactionRepository implements ITransactionRepository{
       action: 'create',
       when: 'after'
     })
+
   }
 
-  async createTransaction({value, type, account_id}: ICreateTransactionDTO): Promise<Transactions>{
+  async createTransaction(data: ICreateTransactionDTO): Promise<Transactions>{
     const transactionCredit = await this.ormRepository.transactions.create({
-      data:{
-        value,
-        type,
-        account_id
-      }
+      data
     })
 
     return transactionCredit
@@ -32,7 +29,7 @@ export class TransactionRepository implements ITransactionRepository{
     const balance = await this.ormRepository.transactions.findMany({
       where:{ account_id },
       orderBy:{
-        created_at: 'asc'
+        created_at: 'desc'
       }
     })
 

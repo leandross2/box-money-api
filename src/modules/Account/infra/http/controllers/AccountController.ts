@@ -15,11 +15,9 @@ export class AccountController{
   }
 
   async show(request: Request, response: Response){
-    const {account_id} = request.params
-
     const showAccount = container.resolve(ShowAccountService)
 
-    const account = await showAccount.execute(account_id)
+    const account = await showAccount.execute(request.account_id)
 
     return response.json(account)
   }

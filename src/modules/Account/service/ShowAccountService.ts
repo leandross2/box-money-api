@@ -16,6 +16,7 @@ export class ShowAccountService{
       throw new AppError('Account not found')
     }
 
+    accountExist.total = accountExist.total /100
     return accountExist
   }
 }

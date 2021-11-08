@@ -7,6 +7,7 @@ interface IRequestDTO{
   account_id: string
   value: number
   type: 'credit' | 'debit'
+  description: string
 }
 
 @injectable()
@@ -16,7 +17,7 @@ export class CreateTransactionService{
     @inject('AccountRepository') private accountRepository: IAccountRepository
   ){}
 
-  async execute({account_id, value, type}:IRequestDTO){
+  async execute({account_id, value, type, description}:IRequestDTO){
     const accountExist = await this.accountRepository.findAccountById(account_id)
 
     if(!accountExist){
@@ -27,8 +28,11 @@ export class CreateTransactionService{
       throw new AppError('Balance unavailable')
     }
 
-    const transaction = await this.transactionRepository.createTransaction({account_id, value, type})
+    const transaction = await this.transactionRepository.createTransaction({account_id, value, type, description})
 
-    return transaction
+    return {
+      ...transaction,
+      value: transaction.value / 100
+    }
   }
 }

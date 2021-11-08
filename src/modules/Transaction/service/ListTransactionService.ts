@@ -4,9 +4,6 @@ import AppError from '@modules/Shared/errors/AppErro';
 import {inject, injectable} from 'tsyringe'
 import { ITransactionRepository } from '../IRepositories/ITransactionRepository';
 
-interface IRequestDTO{
-  account_id: string
-}
 
 interface IResponseDTO{
   transactions: Transactions[]
@@ -24,7 +21,7 @@ export class ListTransactionService{
     @inject('AccountRepository') private accountRepository: IAccountRepository,
   ){}
 
-  async execute({account_id}:IRequestDTO): Promise<IResponseDTO>{
+  async execute(account_id: string): Promise<IResponseDTO>{
 
     const accountExist = await this.accountRepository.findAccountById(account_id)
 
@@ -35,7 +32,7 @@ export class ListTransactionService{
     const transactions = await this.transactionRepository.findAll(account_id)
 
     const total = transactions.reduce((acc, transaction)=>{
-       return transaction.type === 'credit' ? acc + transaction.value : acc - transaction.value
+       return transaction.type === 'credit' ? acc + transaction.value  : acc - transaction.value
     }, 0)
 
     const credits = transactions.reduce((acc, transaction)=>{
@@ -46,10 +43,17 @@ export class ListTransactionService{
        return transaction.type === 'debit' ? acc + transaction.value : acc + 0
     }, 0)
 
-    return {transactions, totals:{
-        total: total,
-        credits,
-        debits
+    const transactionsFormated = transactions.map(transaction => ({
+      ...transaction,
+      value: transaction.value/100
+    }))
+
+    return {
+      transactions:transactionsFormated,
+      totals:{
+        total: total/100,
+        credits: credits / 100,
+        debits: debits / 100
       }
     }
   }

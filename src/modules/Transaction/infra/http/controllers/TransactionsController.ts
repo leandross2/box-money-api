@@ -5,21 +5,21 @@ import {container} from 'tsyringe'
 
 export class TransactionsController{
   async create(request: Request, response: Response): Promise<Response>{
-    const {type, value, account_id} = request.body
+    const {type, value, description} = request.body
+    const {account_id} = request
 
     const createTransaction = container.resolve(CreateTransactionService)
 
-    const transaction = await createTransaction.execute({type, value: Number(value) * 100, account_id})
+    const transaction = await createTransaction.execute({type, value: Number(value) * 100, account_id, description})
 
     return response.json(transaction)
   }
 
   async index(request: Request, response: Response): Promise<Response>{
-    const {account_id} = request.params
 
     const listTransaction = container.resolve(ListTransactionService)
 
-    const transactions = await listTransaction.execute({account_id})
+    const transactions = await listTransaction.execute(request.account_id)
 
     return response.json(transactions)
   }
